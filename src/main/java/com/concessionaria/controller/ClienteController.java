@@ -1,7 +1,10 @@
 package com.concessionaria.controller;
 
-import com.concessionaria.model.Cliente;
-import com.concessionaria.repository.ClienteRepository;
+import com.concessionaria.dto.ClienteRequestDTO;
+import com.concessionaria.dto.ClienteResponseDTO;
+import com.concessionaria.service.ClienteService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,35 +14,30 @@ import java.util.List;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    private final ClienteRepository clienteRepository;
+    private final ClienteService clienteService;
 
-    public ClienteController(ClienteRepository clienteRepository) {
-        this.clienteRepository = clienteRepository;
+    public ClienteController(ClienteService clienteService) {
+        this.clienteService = clienteService;
     }
 
     @PostMapping
-    public Cliente cadastrar(@RequestBody Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public ResponseEntity<ClienteResponseDTO> cadastrar(@Valid @RequestBody ClienteRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.cadastrar(dto));
     }
 
     @GetMapping
-    public List<Cliente> listar() {
-        return clienteRepository.findAll();
+    public List<ClienteResponseDTO> listar() {
+        return clienteService.listar();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarPorId(@PathVariable Long id) {
-        return clienteRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ClienteResponseDTO buscarPorId(@PathVariable Long id) {
+        return clienteService.buscarPorId(id);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
-        if (!clienteRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        clienteRepository.deleteById(id);
+        clienteService.remover(id);
         return ResponseEntity.noContent().build();
     }
 }
