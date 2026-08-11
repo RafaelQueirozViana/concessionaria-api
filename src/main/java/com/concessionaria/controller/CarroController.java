@@ -1,7 +1,10 @@
 package com.concessionaria.controller;
 
-import com.concessionaria.model.Carro;
-import com.concessionaria.repository.CarroRepository;
+import com.concessionaria.dto.CarroRequestDTO;
+import com.concessionaria.dto.CarroResponseDTO;
+import com.concessionaria.service.CarroService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,37 +14,30 @@ import java.util.List;
 @RequestMapping("/carros")
 public class CarroController {
 
-    private final CarroRepository carroRepository;
+    private final CarroService carroService;
 
-    public CarroController(CarroRepository carroRepository) {
-        this.carroRepository = carroRepository;
+    public CarroController(CarroService carroService) {
+        this.carroService = carroService;
     }
 
     @PostMapping
-    public Carro cadastrar(@RequestBody Carro carro) {
-        return carroRepository.save(carro);
+    public ResponseEntity<CarroResponseDTO> cadastrar(@Valid @RequestBody CarroRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(carroService.cadastrar(dto));
     }
 
     @GetMapping
-    public List<Carro> listar() {
-        return carroRepository.findAll();
+    public List<CarroResponseDTO> listar() {
+        return carroService.listar();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Carro> buscarPorId(@PathVariable Long id) {
-        return carroRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public CarroResponseDTO buscarPorId(@PathVariable Long id) {
+        return carroService.buscarPorId(id);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Long id) {
-        if (!carroRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        carroRepository.deleteById(id);
+        carroService.remover(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }
