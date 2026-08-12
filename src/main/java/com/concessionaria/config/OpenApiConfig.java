@@ -13,6 +13,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Concessionária Marcelo Gomes API")
+                        .description("API para controle de estoque de veículos e cadastro de clientes da concessionária.")
                         .version("1.0"));
     }
 }

@@ -44,11 +44,20 @@ public class CarroService {
         return toResponseDTO(carroRepository.save(carro));
     }
 
-    public List<CarroResponseDTO> listar() {
-        return carroRepository.findAll()
-                .stream()
-                .map(this::toResponseDTO)
-                .toList();
+    public List<CarroResponseDTO> listar(String cor, Integer anoModelo) {
+        List<Carro> carros;
+
+        if (cor != null && anoModelo != null) {
+            carros = carroRepository.findByCorIgnoreCaseOrAnoModelo(cor, anoModelo);
+        } else if (cor != null) {
+            carros = carroRepository.findByCorIgnoreCase(cor);
+        } else if (anoModelo != null) {
+            carros = carroRepository.findByAnoModelo(anoModelo);
+        } else {
+            carros = carroRepository.findAll();
+        }
+
+        return carros.stream().map(this::toResponseDTO).toList();
     }
 
     public CarroResponseDTO buscarPorId(Long id) {

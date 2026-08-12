@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -37,4 +38,14 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(new ErroDTO(HttpStatus.CONFLICT.value(), ex.getMessage()));
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErroDTO> tratarParametroInvalido(MethodArgumentTypeMismatchException ex) {
+        String mensagem = "o parâmetro '" + ex.getName() + "' está em um formato inválido";
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErroDTO(HttpStatus.BAD_REQUEST.value(), mensagem));
+    }
+
+
 }
